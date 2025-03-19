@@ -49,20 +49,8 @@ DB_PASSWORD=
 DB_NAME=todos_db
 ```
 
-#### **2.2 Run MySQL Database**
-```sql
-CREATE DATABASE todos_db;
-USE todos_db;
-CREATE TABLE todos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    completed BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
 
-#### **2.3 Start the Backend Server**
+#### **2.2 Start the Backend Server**
 ```bash
 node server.js
 ```
