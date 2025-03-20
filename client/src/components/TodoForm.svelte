@@ -1,8 +1,9 @@
+<!-- TodoForm.svelte -->
 <script>
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
 
-  export let todo = null; // If provided, we're editing an existing todo
+  export let todo = null;
   
   let title = todo ? todo.title : '';
   let description = todo ? todo.description : '';
@@ -19,7 +20,7 @@
       const url = todo 
         ? `${API_URL}/todos/${todo.id}`
         : `${API_URL}/todos`;
-      
+        
       const method = todo ? 'PUT' : 'POST';
       
       const response = await fetch(url, {
@@ -33,7 +34,29 @@
       if (!response.ok) throw new Error('Failed to save todo');
 
       const savedTodo = await response.json();
-      dispatch('save', savedTodo);
+      dispatch('refresh');
+    } catch (err) {
+      error = err.message;
+    } finally {
+      loading = false;
+    }
+  }
+
+  async function handleComplete(todoId) {
+    try {
+      loading = true;
+      error = null;
+      
+      const response = await fetch(`${API_URL}/todos/${todoId}/complete`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ completed: true })
+      });
+
+      if (!response.ok) throw new Error('Failed to complete todo');
+
       dispatch('refresh');
     } catch (err) {
       error = err.message;
@@ -43,100 +66,134 @@
   }
 </script>
 
-<form on:submit|preventDefault={handleSubmit} class="todo-form">
-  <h2>{todo ? 'Edit Todo' : 'Create New Todo'}</h2>
-  
-  {#if error}
-    <div class="error">{error}</div>
-  {/if}
-  
-  <div class="form-group">
-    <label for="title">Title</label>
-    <input
-      id="title"
-      type="text"
-      bind:value={title}
-      placeholder="Enter todo title"
-      required
-    />
-  </div>
-  
-  <div class="form-group">
-    <label for="description">Description</label>
-    <textarea
-      id="description"
-      bind:value={description}
-      placeholder="Enter todo description"
-      rows="4"
-    ></textarea>
-  </div>
-  
-  <div class="form-actions">
-    <button type="button" on:click={() => dispatch('cancel')}>
-      Cancel
-    </button>
-    <button type="submit" disabled={loading}>
-      {loading ? 'Saving...' : (todo ? 'Update' : 'Create')}
-    </button>
-  </div>
-</form>
+<!-- TodoForm.svelte -->
+<div class="form-container">
+  <h2>{todo ? 'Edit Task' : 'Create New Task'}</h2>
+
+  <form on:submit|preventDefault={handleSubmit}>
+    {#if error}
+      <div class="error">
+        <i class="fas fa-exclamation-circle"></i>
+        {error}
+      </div>
+    {/if}
+    
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input
+        id="title"
+        type="text"
+        bind:value={title}
+        placeholder="Enter task title"
+        required
+      />
+    </div>
+    
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        bind:value={description}
+        placeholder="Enter task description"
+        rows="4"
+      ></textarea>
+    </div>
+    
+    <div class="form-actions">
+      <button type="button" class="cancel-btn" on:click={() => dispatch('cancel')}>
+        Cancel
+      </button>
+      <button type="submit" class="submit-btn" disabled={loading}>
+        {#if loading}
+          <i class="fas fa-spinner fa-spin"></i>
+        {:else}
+          <i class="fas fa-save"></i>
+        {/if}
+        {loading ? 'Saving...' : (todo ? 'Update' : 'Create')}
+      </button>
+    </div>
+  </form>
+</div>
 
 <style>
-  .todo-form {
-    max-width: 500px;
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  .form-container {
+    padding: 2rem;
+  }
+
+  h2 {
+    margin: 0 0 1.5rem 0;
+    color: #1e293b;
+    font-size: 1.5rem;
   }
 
   .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 1.5rem;
   }
 
   label {
     display: block;
-    margin-bottom: 5px;
-    color: #333;
+    margin-bottom: 0.5rem;
+    color: #4b5563;
+    font-weight: 500;
   }
 
   input, textarea {
     width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
     font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
   }
 
   .form-actions {
     display: flex;
-    gap: 10px;
     justify-content: flex-end;
-    margin-top: 20px;
+    gap: 1rem;
+    margin-top: 2rem;
   }
 
-  button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
+  .cancel-btn, .submit-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     cursor: pointer;
   }
 
-  button[type="submit"] {
-    background-color: #4CAF50;
+  .cancel-btn {
+    background: #f1f5f9;
+    border: none;
+    color: #64748b;
+  }
+
+  .submit-btn {
+    background: #4CAF50;
+    border: none;
     color: white;
   }
 
-  button[type="button"] {
-    background-color: #f5f5f5;
-    color: #333;
+  .submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
   }
 
   .error {
-    color: #f44336;
-    margin-bottom: 15px;
-    padding: 10px;
-    background-color: #ffebee;
-    border-radius: 4px;
+    background: #fef2f2;
+    color: #ef4444;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 </style>

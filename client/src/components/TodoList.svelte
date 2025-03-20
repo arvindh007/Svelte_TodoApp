@@ -7,7 +7,7 @@
   let filter = 'all';
   let loading = true;
   let error = null;
-  let updateInputs = {};
+  // let updateInputs = {};
 
   const API_URL = 'http://localhost:5000';
 
@@ -46,59 +46,59 @@
     }
   }
 
-  async function toggleTodo(id) {
-    try {
-      const response = await fetch(`${API_URL}/todos/${id}/toggle`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+  // async function toggleTodo(id) {
+  //   try {
+  //     const response = await fetch(`${API_URL}/todos/${id}/toggle`, {
+  //       method: 'PATCH',
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       }
+  //     });
       
-      if (!response.ok) throw new Error('Failed to toggle todo');
+  //     if (!response.ok) throw new Error('Failed to toggle todo');
       
-      const updatedTodo = await response.json();
-      todos = todos.map(todo => 
-        todo.id === updatedTodo.id ? updatedTodo : todo
-      );
-    } catch (err) {
-      error = err.message;
-    }
-  }
+  //     const updatedTodo = await response.json();
+  //     todos = todos.map(todo => 
+  //       todo.id === updatedTodo.id ? updatedTodo : todo
+  //     );
+  //   } catch (err) {
+  //     error = err.message;
+  //   }
+  // }
 
-  async function addUpdate(event, todoId) {
-    event.preventDefault();
-    const updateText = updateInputs[todoId] || '';
-    if (!updateText.trim()) return;
+  // async function addUpdate(event, todoId) {
+  //   event.preventDefault();
+  //   const updateText = updateInputs[todoId] || '';
+  //   if (!updateText.trim()) return;
 
-    try {
-      const response = await fetch(`${API_URL}/todos/${todoId}/updates`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ update: updateText })
-      });
+  //   try {
+  //     const response = await fetch(`${API_URL}/todos/${todoId}/updates`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: JSON.stringify({ update: updateText })
+  //     });
 
-      if (!response.ok) throw new Error('Failed to add update');
+  //     if (!response.ok) throw new Error('Failed to add update');
 
-      const updatedTodo = await response.json();
-      todos = todos.map(todo => 
-        todo.id === updatedTodo.id ? updatedTodo : todo
-      );
-      updateInputs[todoId] = ''; // Clear only this todo's input
-      updateInputs = {...updateInputs}; // Trigger reactivity
-    } catch (err) {
-      error = err.message;
-    }
-  }
+  //     const updatedTodo = await response.json();
+  //     todos = todos.map(todo => 
+  //       todo.id === updatedTodo.id ? updatedTodo : todo
+  //     );
+  //     updateInputs[todoId] = ''; // Clear only this todo's input
+  //     updateInputs = {...updateInputs}; // Trigger reactivity
+  //   } catch (err) {
+  //     error = err.message;
+  //   }
+  // }
 
   
 
-  function handleUpdateInput(todoId, value) {
-    updateInputs[todoId] = value;
-    updateInputs = {...updateInputs}; // Trigger reactivity
-  }
+  // function handleUpdateInput(todoId, value) {
+  //   updateInputs[todoId] = value;
+  //   updateInputs = {...updateInputs}; // Trigger reactivity
+  // }
 
   function formatDate(date) {
     return new Date(date).toLocaleDateString('en-US', {
@@ -120,15 +120,15 @@
 </script>
 
 <div class="filters">
-  <button class:active={filter === 'all'} on:click={() => filter = 'all'}>
+  <!-- <button class:active={filter === 'all'} on:click={() => filter = 'all'}>
     All
   </button>
   <button class:active={filter === 'active'} on:click={() => filter = 'active'}>
     Active
-  </button>
-  <button class:active={filter === 'completed'} on:click={() => filter = 'completed'}>
+  </button> -->
+  <!-- <button class:active={filter === 'completed'} on:click={() => filter = 'completed'}>
     Completed
-  </button>
+  </button> -->
 </div>
 
 <div class="todo-list">
@@ -153,16 +153,16 @@
       >
         <div class="todo-content">
           <div class="todo-header">
-            <input
+            <!-- <input
               type="checkbox"
               checked={todo.completed}
               on:change={() => toggleTodo(todo.id)}
               on:click|stopPropagation
-            />
+            /> -->
             <div class="todo-title-section">
               <h3 class="todo-title {todo.completed ? 'completed' : ''}">{todo.title}</h3>
               <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <form 
+              <!-- <form 
                 on:submit={(e) => addUpdate(e, todo.id)} 
                 class="update-form"
                 on:click|stopPropagation
@@ -174,11 +174,11 @@
                   class="update-input"
                 />
                 <button type="submit" class="update-button">Add</button>
-              </form>
+              </form> -->
             </div>
           </div>
 
-          {#if todo.updates && todo.updates.length > 0}
+          <!-- {#if todo.updates && todo.updates.length > 0}
             <div class="updates-list">
               {#each todo.updates as update}
                 <div class="update-entry">
@@ -187,7 +187,7 @@
                 </div>
               {/each}
             </div>
-          {/if}
+          {/if} -->
 
           {#if todo.created_at}
             <div class="todo-date">
@@ -255,69 +255,6 @@
     color: #888;
   }
 
-  .update-form {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-  }
-
-  .update-input {
-    flex-grow: 1;
-    padding: 4px 8px;
-    font-size: 0.9rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    height: 24px;
-    background-color: white;
-  }
-
-  .update-button {
-    padding: 2px 8px;
-    height: 24px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .update-button:hover {
-    background-color: #45a049;
-  }
-
-  .updates-list {
-    margin-top: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .update-entry {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 4px 8px;
-    background-color: #f0f0f0;
-    border-radius: 4px;
-    font-size: 0.85rem;
-  }
-
-  .update-text {
-    flex-grow: 1;
-    margin-right: 8px;
-  }
-
-  .update-date {
-    color: #666;
-    font-size: 0.8rem;
-    white-space: nowrap;
-  }
-
   .todo-date {
     font-size: 0.85rem;
     color: #666;
@@ -328,34 +265,6 @@
     display: flex;
     gap: 1rem;
     margin-bottom: 1rem;
-  }
-
-  .filters button {
-    padding: 8px 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: white;
-    cursor: pointer;
-  }
-
-  .filters button.active {
-    background: #4CAF50;
-    color: white;
-    border-color: #45a049;
-  }
-
-  .filters button:hover {
-    background-color: #f0f0f0;
-  }
-
-  .filters button.active:hover {
-    background-color: #45a049;
-  }
-
-  input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
   }
 
   .loading, .error, .empty {
